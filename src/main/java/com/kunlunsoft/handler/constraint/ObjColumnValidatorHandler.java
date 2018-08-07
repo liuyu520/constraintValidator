@@ -2,6 +2,7 @@ package com.kunlunsoft.handler.constraint;
 
 import com.string.widget.util.ValueWidget;
 import com.kunlunsoft.annotation.ObjColumnEitherHasVal;
+import oa.shortCut.LogicExc;
 import org.springframework.util.ReflectionUtils;
 
 import javax.validation.ConstraintValidator;
@@ -14,6 +15,9 @@ public class ObjColumnValidatorHandler implements ConstraintValidator<ObjColumnE
 
     private static Object getColumnVal(Object object, Class clazz, String column) {
         Method m = ReflectionUtils.findMethod(clazz, "get" + ValueWidget.capitalize(column));
+        if (null == m) {
+            LogicExc.throwEx("5000", "成员变量 " + column + "没有对应的getter 方法");
+        }
         Object val = null;
         try {
             val = m.invoke(object, null);

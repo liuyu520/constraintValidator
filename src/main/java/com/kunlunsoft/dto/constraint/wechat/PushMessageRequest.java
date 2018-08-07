@@ -12,13 +12,14 @@ import java.util.Map;
  */
 @Data
 public class PushMessageRequest implements java.io.Serializable {
-    @ObjColumnEitherHasVal(columns = {"sceneCode", "templateId"}, message = "template 不能为空")
+    //    @ObjColumnEitherHasVal(columns = {"sceneCode", "templateId"}, message = "template 不能为空")
     private MsgTemplate template;
     private Map<String, NotifyDataDTO> data;
     //    @NotNull
     private String wechatAppId;
     private String link;
     //    @NotNull
+    @ObjColumnEitherHasVal(columns = {"userIds", "openIds"}, message = "target 不能为空")
     private PushTarget target;
 
 
