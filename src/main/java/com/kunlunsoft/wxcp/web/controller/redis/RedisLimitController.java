@@ -29,30 +29,39 @@ public class RedisLimitController {
         return RedisCacheUtil2.limitBlock();
     }
 
+    /**
+     * 这里有个思维误区:<br />
+     * 比如限制3次,如果总次数都没有超过3次,则肯定校验通过,即没有超过限制
+     *
+     * @return
+     */
     public static boolean isLimit() {
         long n = System.currentTimeMillis();
         Map records = RedisCacheUtil2.getPushRecordList();
         if (ValueWidget.isNullOrEmpty(records)) {
             return false;
         }
+        // 1 分钟之内不能超过 4
+        int limitCount = 3;
+        int limitTime = 20 * 1000;//1 分钟,单位:豪秒
         List<String> timestamps = new ArrayList<String>(records.values());
+        return checkLimit(n, limitCount, limitTime, timestamps);
+    }
+
+    private static boolean checkLimit(long n, int limitCount, int limitTime, List<String> timestamps) {
         SortList<String> sortUtil = new SortList<String>();
         sortUtil.sort(timestamps, null, "desc");
 
-        // 1 分钟之内不能超过 4
-        int limitCount = 4;
-        int limitTime = 20 * 1000;//1 分钟,单位:豪秒
 
         int length = timestamps.size();
         if (length < limitCount) {
             //没有超过限制
             return false;
         }
-        int toIndex = 0;//要截取的最大序号
+        int toIndex = limitCount;//要截取的最大序号
         /*if (limitCount + 1 > length) {
             toIndex = length;
         } else {*/
-        toIndex = limitCount;
 //        }
         List<String> result = timestamps.subList(0, toIndex);
         //和当前时间比较
