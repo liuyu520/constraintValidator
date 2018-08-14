@@ -37,23 +37,28 @@ public class RedisLimitController {
         SortList<String> sortUtil = new SortList<String>();
         sortUtil.sort(timestamps, null, "desc");
 
-        int limitCount = 11;
-        int limitTime = 60;//1小时,单位:秒
+        // 1 分钟之内不能超过 1 分钟
+        int limitCount = 4;
+        int limitTime = 60 * 1000;//1 分钟,单位:豪秒
 
         int length = timestamps.size();
-        if (length < 2) {
+        if (length < limitCount) {
             //没有超过限制
             return false;
         }
         int toIndex = 0;//要截取的最大序号
-        if (limitCount > length) {
+        if (limitCount + 1 > length) {
             toIndex = length;
         } else {
-            toIndex = limitCount;
+            toIndex = limitCount + 1;
         }
         List<String> result = timestamps.subList(0, toIndex);
-        long delter = Long.parseLong(result.get(0)) - Long.parseLong(result.get(toIndex - 1));
+        //和当前时间比较
+        long n = System.currentTimeMillis();
+        System.out.println("n :" + n);
+        long delter = /*result.get(0))*/n - Long.parseLong(result.get(toIndex - 1));
         long delterSecond = delter;
+        System.out.println("delter :" + delter);
         System.out.println(delterSecond);
         if (delterSecond < limitTime) {
             System.out.println("超限");
@@ -68,10 +73,10 @@ public class RedisLimitController {
     @RequestMapping(value = "/push/accept/json", produces = SystemHWUtil.RESPONSE_CONTENTTYPE_JSON_UTF)
     public String jsonPut2(Model model, HttpServletRequest request, HttpServletResponse response
             , @RequestParam(required = false) String orderNo) {
-        RedisCacheUtil2.acceptRequest(orderNo);
         if (isLimit()) {
             return new BaseResponseDto().setErrorMessage("您超过了限制").toJson();
         }
+        RedisCacheUtil2.acceptRequest(orderNo + String.valueOf(System.currentTimeMillis()).substring(5));
         return BaseResponseDto.jsonValue(orderNo);
     }
 }
