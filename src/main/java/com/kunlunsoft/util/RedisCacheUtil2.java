@@ -2,6 +2,8 @@ package com.kunlunsoft.util;
 
 import com.common.util.RedisHelper;
 
+import java.util.Map;
+
 public class RedisCacheUtil2 {
     public static String REDISKEY_SUITETICKET = "wx_suiteTicket";
 
@@ -16,6 +18,10 @@ public class RedisCacheUtil2 {
 
     public static void acceptRequest(String orderNo) {
         RedisHelper.getInstance().saveKeyCacheExpire1day("pushLimit", orderNo, String.valueOf(System.currentTimeMillis()));
+    }
+
+    public static Map getPushRecordList() {
+        return RedisHelper.getInstance().getAllKeyCache("pushLimit");
     }
 
     /***
