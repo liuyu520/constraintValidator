@@ -3,6 +3,7 @@ package com.kunlunsoft.wxcp.web.controller.redis;
 import com.common.bean.BaseResponseDto;
 import com.common.util.SortList;
 import com.common.util.SystemHWUtil;
+import com.io.hw.json.HWJacksonUtils;
 import com.kunlunsoft.util.RedisCacheUtil2;
 import com.string.widget.util.ValueWidget;
 import org.springframework.ui.Model;
@@ -29,6 +30,7 @@ public class RedisLimitController {
     }
 
     public static boolean isLimit() {
+        long n = System.currentTimeMillis();
         Map records = RedisCacheUtil2.getPushRecordList();
         if (ValueWidget.isNullOrEmpty(records)) {
             return false;
@@ -37,30 +39,32 @@ public class RedisLimitController {
         SortList<String> sortUtil = new SortList<String>();
         sortUtil.sort(timestamps, null, "desc");
 
-        // 1 分钟之内不能超过 1 分钟
+        // 1 分钟之内不能超过 4
         int limitCount = 4;
-        int limitTime = 60 * 1000;//1 分钟,单位:豪秒
+        int limitTime = 20 * 1000;//1 分钟,单位:豪秒
 
         int length = timestamps.size();
-        if (length < limitCount) {
+        if (length <= limitCount) {
             //没有超过限制
             return false;
         }
         int toIndex = 0;//要截取的最大序号
-        if (limitCount + 1 > length) {
+        /*if (limitCount + 1 > length) {
             toIndex = length;
-        } else {
-            toIndex = limitCount + 1;
-        }
+        } else {*/
+        toIndex = limitCount;
+//        }
         List<String> result = timestamps.subList(0, toIndex);
         //和当前时间比较
-        long n = System.currentTimeMillis();
+
         System.out.println("n :" + n);
         long delter = /*result.get(0))*/n - Long.parseLong(result.get(toIndex - 1));
         long delterSecond = delter;
         System.out.println("delter :" + delter);
         System.out.println(delterSecond);
         if (delterSecond < limitTime) {
+            System.out.println("record :" + HWJacksonUtils.getJsonP(result));
+            System.out.println("timestamps :" + HWJacksonUtils.getJsonP(timestamps));
             System.out.println("超限");
             return true;
         } else {
@@ -77,6 +81,6 @@ public class RedisLimitController {
             return new BaseResponseDto().setErrorMessage("您超过了限制").toJson();
         }
         RedisCacheUtil2.acceptRequest(orderNo + String.valueOf(System.currentTimeMillis()).substring(5));
-        return BaseResponseDto.jsonValue(orderNo);
+        return BaseResponseDto.put2("orderNo", orderNo).put("tips", "可以继续操作").toJson();
     }
 }
