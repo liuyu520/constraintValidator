@@ -24,11 +24,13 @@ public class RedisCacheUtil2 {
     public static String limitBlock() {
         //如果没有key,则返回"OK"
         String result = RedisHelper.getInstance().saveExpxKeyCache("pushLimitBlocked", "0", 3600);
-        if ("OK".equals(result)) {
+        if (RedisHelper.isOk(result)) {
             System.out.println(" success:");
         } else {
             System.out.println(" failed !!!");
         }
         return result;
     }
+
+
 }
