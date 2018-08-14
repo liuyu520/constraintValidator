@@ -44,7 +44,7 @@ public class RedisLimitController {
         int limitTime = 20 * 1000;//1 分钟,单位:豪秒
 
         int length = timestamps.size();
-        if (length <= limitCount) {
+        if (length < limitCount) {
             //没有超过限制
             return false;
         }
@@ -80,7 +80,7 @@ public class RedisLimitController {
         if (isLimit()) {
             return new BaseResponseDto().setErrorMessage("您超过了限制").toJson();
         }
-        RedisCacheUtil2.acceptRequest(orderNo + String.valueOf(System.currentTimeMillis()).substring(5));
+        RedisCacheUtil2.acceptRequest(orderNo + String.valueOf(System.currentTimeMillis()).substring(4));
         return BaseResponseDto.put2("orderNo", orderNo).put("tips", "可以继续操作").toJson();
     }
 }
