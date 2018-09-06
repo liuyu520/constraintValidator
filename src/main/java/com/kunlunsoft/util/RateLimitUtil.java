@@ -14,12 +14,20 @@ import java.util.List;
  * @since 2018/9/6
  */
 public class RateLimitUtil {
-    public static boolean checkLimit(long n, int limitCount, int limitTime, List<String> timestamps) {
+    /***
+     *
+     * @param n : 参照的当前时间,单位:毫秒
+     * @param limitCount
+     * @param limitTimeMillis : 毫秒
+     * @param timestamps
+     * @return
+     */
+    public static boolean checkLimit(long n, int limitCount, int limitTimeMillis, List<String> timestamps) {
         if (ValueWidget.isNullOrEmpty(timestamps)) {
             return false;
         }
         int length = timestamps.size();
-        if (length <= limitCount) {
+        if (length < limitCount) {
             //没有超过限制
             return false;
         }
@@ -40,7 +48,7 @@ public class RateLimitUtil {
         long delterSecond = delter;
         System.out.println("delter :" + delter);
         System.out.println(delterSecond);
-        if (delterSecond < limitTime) {
+        if (delterSecond < limitTimeMillis) {
             System.out.println("record :" + HWJacksonUtils.getJsonP(result));
             System.out.println("timestamps :" + HWJacksonUtils.getJsonP(timestamps));
             System.out.println("超限");
