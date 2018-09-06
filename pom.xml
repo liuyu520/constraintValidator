@@ -298,13 +298,6 @@
 
 
         <dependency>
-            <groupId>org.fluentlenium</groupId>
-            <artifactId>fluentlenium-junit</artifactId>
-            <version>3.4.0</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
             <groupId>yunmasoft.com</groupId>
             <artifactId>oa_framework</artifactId>
             <version>0.0.3.2-SNAPSHOT</version>
